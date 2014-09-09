@@ -27,6 +27,8 @@
         <!--  Entry for RegisterActivity.class -->
         <activity android:name=".RegisterActivity"
                   android:label="Register New Account"></activity>
+        <activity android:name=".SecretListActivity"
+                  android:label="Register New Account"></activity>
     </application>
 
 </manifest>

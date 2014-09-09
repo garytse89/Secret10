@@ -1,14 +1,19 @@
 package com.example.secret10;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class LoginActivity extends Activity {
@@ -40,7 +46,10 @@ public class LoginActivity extends Activity {
 			}
 		});
 		
-		Button loginBtn = (Button) findViewById(R.id.btnLogin);
+		final EditText mGender = (EditText) findViewById(R.id.genderField);
+		final EditText mCountry = (EditText) findViewById(R.id.countryField);
+		
+		Button loginBtn = (Button) findViewById(R.id.signUpLogin);
 		loginBtn.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -49,7 +58,7 @@ public class LoginActivity extends Activity {
 				    @Override
 				    public void run() {
 				        try {
-				        	login();
+				        	login(mGender.getText().toString(), mCountry.getText().toString());
 				        } catch (Exception e) {
 				            e.printStackTrace();
 				        }
@@ -81,14 +90,28 @@ public class LoginActivity extends Activity {
 	}
 	
 	// defined methods
-	public void login() {
+	public void login(String gender, String country) throws UnsupportedEncodingException {
 		Log.d("login", "login() inside");
 		HttpClient httpclient = new DefaultHttpClient();
-		HttpGet get = new HttpGet(LOGIN_URL);
-		ResponseHandler<String> handler = new BasicResponseHandler();  
+		HttpPost post = new HttpPost(LOGIN_URL);
+		ResponseHandler<String> handler = new BasicResponseHandler(); 
+		
+		// add data in List<NameValuePair> form then converted to urlencodedformentity
+		// and finally strapped onto the post
+		List<NameValuePair> listData = new ArrayList<NameValuePair>();
+		listData.add(new BasicNameValuePair("gender", gender));
+		listData.add(new BasicNameValuePair("country", country));
+		post.setEntity(new UrlEncodedFormEntity(listData));
+		
         try {  
-            String result = httpclient.execute(get, handler);  
-            Log.d("login", result);
+            String result = httpclient.execute(post, handler);
+            
+            if( result.equals("ok") ) { // don't use == for string equality
+            	Log.d("login", "sign up ok, load next page");
+            	Intent i = new Intent(getApplicationContext(), SecretListActivity.class);
+				startActivity(i);					
+            }
+            
         } catch (ClientProtocolException e) {  
             e.printStackTrace();  
         } catch (IOException e) {  
