@@ -2,6 +2,8 @@ package com.example.secret10;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -14,33 +16,52 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 
-public class SecretListActivity extends Activity {
+public class SecretListActivity extends Activity  {
 	
 	private WebSocketClient mWebSocketClient;
+
+    ListView listView;
+    List<String> values = new ArrayList<String>();
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.sampleclient);
+
+        listView = (ListView) findViewById(R.id.list);
+        Button sendBtn = (Button) findViewById(R.id.sendBtn);
+        sendBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                sendMessage();
+            }
+        });
 		
 		connectWebSocket();
-		
-		Button sendBtn = (Button) findViewById(R.id.sendBtn);
-		sendBtn.setOnClickListener(new View.OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				sendMessage();				
-			}
-		});
-		
-		TextView loginScreen = (TextView) findViewById(R.id.link_to_login);
-		loginScreen.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				finish();
-			};
-		});
+
+        // populate list view with array of strings
+        // define an adapter and attach it to listview
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, values);
+        listView.setAdapter(adapter);
+
+        // set listener on listView
+        listView.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(),
+                        (String) listView.getItemAtPosition(position), Toast.LENGTH_LONG)
+                        .show();
+            }
+        });
 	}
 	
 	private void connectWebSocket() {
@@ -90,9 +111,15 @@ public class SecretListActivity extends Activity {
 	
 	public void sendMessage() {
 		EditText editText = (EditText)findViewById(R.id.message);
-		mWebSocketClient.send(editText.getText().toString());
+        String msg = editText.getText().toString();
+		mWebSocketClient.send(msg);
 		editText.setText("");
+
+        // append to list
+        values.add("Me: " + msg);
+        Log.i("Websocket", "sent message = " + msg);
+        listView.invalidateViews();
+
 	}
-	
 
 }

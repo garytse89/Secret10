@@ -32,37 +32,43 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:padding="10dip"
-          android:layout_below="@id/header">
-          <!-- Full Name Label -->
-          <TextView android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#372c24"
-                android:text="Message"/>
-          <EditText android:id="@+id/message"
+          android:layout_below="@id/header"
+            android:weightSum="1"
+            android:id="@+id/linearLayout">
+          <!-- List -->
+          <ListView android:id="@+id/list"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dip"
-                android:singleLine="true"
-                android:layout_marginBottom="20dip"/>
-          
-          <!-- Register Button -->
-          <Button android:id="@+id/sendBtn"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dip"
-                android:text="Send"/>
-          <!-- Link to Login Screen -->
-          <TextView android:id="@+id/link_to_login"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dip"
-                android:layout_marginBottom="40dip"
-                android:text="Already has account! Login here"
-                android:gravity="center"
-                android:textSize="20dip"
-                android:textColor="#025f7c"/>
- 
+                android:layout_height="394dp"
+              android:layout_weight="4.80" />
+
         </LinearLayout>
-        <!-- Registration Form Ends -->
+
+      <RelativeLayout
+          android:layout_width="fill_parent"
+          android:layout_height="fill_parent"
+          android:layout_centerHorizontal="true"
+          android:layout_below="@+id/linearLayout">
+
+          <Button
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Send"
+              android:id="@+id/sendBtn"
+              android:layout_alignBottom="@+id/message"
+              android:layout_alignParentRight="true"
+              android:layout_alignParentEnd="true" />
+
+          <EditText
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:id="@+id/message"
+              android:layout_alignParentBottom="true"
+              android:layout_alignParentLeft="true"
+              android:layout_alignParentStart="true"
+              android:layout_toLeftOf="@+id/sendBtn"
+              android:layout_toStartOf="@+id/sendBtn" />
+      </RelativeLayout>
+
+      <!-- Registration Form Ends -->
   </RelativeLayout>
 </ScrollView>

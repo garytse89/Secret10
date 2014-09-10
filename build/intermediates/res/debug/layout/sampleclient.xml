@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:fillViewport="true">
+  <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" android:background="#fff">
+ 
+        <!--  Header  Starts-->
+        <LinearLayout android:id="@+id/header"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:paddingTop="5dip"
+                android:paddingBottom="5dip">
+                <!-- Logo Start-->
+                <ImageView android:src="@drawable/secret"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dip"/>
+                <!-- Logo Ends -->
+        </LinearLayout>
+        <!--  Header Ends -->
+        <!-- Footer Start -->
+        <!-- Footer Ends -->
+ 
+        <!-- Registration Form -->
+        <LinearLayout
+          android:orientation="vertical"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:padding="10dip"
+          android:layout_below="@id/header"
+            android:weightSum="1"
+            android:id="@+id/linearLayout">
+          <!-- List -->
+          <ListView android:id="@+id/list"
+                android:layout_width="fill_parent"
+                android:layout_height="394dp"
+              android:layout_weight="4.80" />
+
+        </LinearLayout>
+
+      <RelativeLayout
+          android:layout_width="fill_parent"
+          android:layout_height="fill_parent"
+          android:layout_centerHorizontal="true"
+          android:layout_below="@+id/linearLayout">
+
+          <Button
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Send"
+              android:id="@+id/sendBtn"
+              android:layout_alignBottom="@+id/message"
+              android:layout_alignParentRight="true"
+              android:layout_alignParentEnd="true" />
+
+          <EditText
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:id="@+id/message"
+              android:layout_alignParentBottom="true"
+              android:layout_alignParentLeft="true"
+              android:layout_alignParentStart="true"
+              android:layout_toLeftOf="@+id/sendBtn"
+              android:layout_toStartOf="@+id/sendBtn" />
+      </RelativeLayout>
+
+      <!-- Registration Form Ends -->
+  </RelativeLayout>
+</ScrollView><!-- From: file:/Users/garytse/Documents/workspace/secret10/res/layout/sampleclient.xml -->

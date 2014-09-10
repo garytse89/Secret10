@@ -31,7 +31,6 @@ public class LoginActivity extends Activity {
 	
 	private final String LOGIN_URL = "http://192.168.1.68:3000/login";
 	
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
