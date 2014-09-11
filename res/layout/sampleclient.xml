@@ -7,26 +7,6 @@
   <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" android:background="#fff">
- 
-        <!--  Header  Starts-->
-        <LinearLayout android:id="@+id/header"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:background="#ffffff"
-                android:paddingTop="5dip"
-                android:paddingBottom="5dip">
-                <!-- Logo Start-->
-                <ImageView android:src="@drawable/secret"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dip"/>
-                <!-- Logo Ends -->
-        </LinearLayout>
-        <!--  Header Ends -->
-        <!-- Footer Start -->
-        <!-- Footer Ends -->
- 
-        <!-- Registration Form -->
         <LinearLayout
           android:orientation="vertical"
           android:layout_width="match_parent"
@@ -38,14 +18,14 @@
           <!-- List -->
           <ListView android:id="@+id/list"
                 android:layout_width="fill_parent"
-                android:layout_height="394dp"
+                android:layout_height="640dp"
               android:layout_weight="4.80" />
 
         </LinearLayout>
 
       <RelativeLayout
           android:layout_width="fill_parent"
-          android:layout_height="fill_parent"
+          android:layout_height="wrap_content"
           android:layout_centerHorizontal="true"
           android:layout_below="@+id/linearLayout">
 

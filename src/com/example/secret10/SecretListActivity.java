@@ -7,8 +7,11 @@ import java.util.List;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -78,20 +81,53 @@ public class SecretListActivity extends Activity  {
 		    @Override
 		    public void onOpen(ServerHandshake serverHandshake) {
 		      Log.i("Websocket", "Opened");
-		      mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
+		      // mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
 		    }
 
 		    @Override
 		    public void onMessage(String s) {
 		      final String message = s;
+              String eventType = null;
+              try {
+                  final JSONObject obj = new JSONObject(s);
+                  eventType = obj.getString("event");
+                  // if new message
+                  if(!eventType.isEmpty()) {
+                      Log.i("Websocket", eventType);
+                      if(eventType.equals("message")) {
+                          runOnUiThread(new Runnable() {
+                              @Override
+                              public void run() {
+                                  try {
+                                      String msg = obj.getString("data");
+                                      String sender = obj.getString("user");
+                                      addToList(sender + ": " + msg);
+                                  } catch(Exception e){};
+
+                              }
+                          });
+                      } else if(eventType.equals("update_userlist")) {
+                          Log.i("Websocket", "update_userlist");
+                          final Context context = getApplicationContext();
+                          final CharSequence text = "user joined or left";
+                          final int duration = Toast.LENGTH_SHORT;
+
+                          runOnUiThread(new Runnable() {
+                              public void run() {
+                                  Toast toast = Toast.makeText(context, text, duration);
+                                  toast.show();
+                              }
+                          });
+                      }
+                  }
+              } catch( JSONException e ) {
+                  Log.i("Websocket", "Invalid JSON message");
+              };
+
 		      Log.i("Websocket", s);
-		      runOnUiThread(new Runnable() {
-		        @Override
-		        public void run() {
-		          //TextView textView = (TextView)findViewById(R.id.messages);
-		          //textView.setText(textView.getText() + "\n" + message);
-		        }
-		      });
+
+
+
 		    }
 
 		    @Override
@@ -115,11 +151,13 @@ public class SecretListActivity extends Activity  {
 		mWebSocketClient.send(msg);
 		editText.setText("");
 
-        // append to list
-        values.add("Me: " + msg);
+        addToList("Me: " + msg);
+    }
+
+    public void addToList(String msg) {
+        values.add(msg);
         Log.i("Websocket", "sent message = " + msg);
         listView.invalidateViews();
-
-	}
+    }
 
 }
