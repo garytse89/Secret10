@@ -51,9 +51,7 @@ public class SecretListActivity extends Activity {
         listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(),
-                        (String) listView.getItemAtPosition(position), Toast.LENGTH_LONG)
-                        .show();
+                Log.i("Websocket", "Selected: " + listView.getItemAtPosition(position));
             }
         });
     }
