@@ -26,7 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class SecretListActivity extends Activity {
+public class ChatActivity extends Activity  {
 
     private WebSocketClient mWebSocketClient;
 
@@ -36,11 +36,20 @@ public class SecretListActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.contactlist);
+        setContentView(R.layout.chat);
 
         listView = (ListView) findViewById(R.id.contactList);
+        Button sendBtn = (Button) findViewById(R.id.sendBtn);
+        sendBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                sendMessage();
+            }
+        });
 
         connectWebSocket();
+
 
         // populate list view with array of strings
         // define an adapter and attach it to listview
@@ -49,6 +58,7 @@ public class SecretListActivity extends Activity {
 
         // set listener on listView
         listView.setOnItemClickListener(new OnItemClickListener() {
+
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(getApplicationContext(),
@@ -84,10 +94,24 @@ public class SecretListActivity extends Activity {
                     eventType = obj.getString("event");
 
                     // if new incoming message
-                    if (!eventType.isEmpty()) {
+                    if(!eventType.isEmpty()) {
                         Log.i("Websocket", eventType);
+                        /**
+                         if(eventType.equals("message")) {
+                         runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                        try {
+                        String msg = obj.getString("data");
+                        String sender = obj.getString("user");
+                        addToList(sender + ": " + msg);
+                        } catch(Exception e){};
 
-                        if (eventType.equals("update_userlist")) {
+                        }
+                        });
+                         **/
+
+                        if(eventType.equals("update_userlist")) {
                             Log.i("Websocket", "update_userlist");
                             final Context context = getApplicationContext();
                             final CharSequence text = "user joined or left";
@@ -101,15 +125,12 @@ public class SecretListActivity extends Activity {
                                 JSONObject allOnlineUsers = new JSONObject(obj.getString("data"));
                                 Iterator<?> keys = allOnlineUsers.keys();
 
-                                while (keys.hasNext()) {
-                                    String key = (String) keys.next();
+                                while( keys.hasNext() ) {
+                                    String key = (String)keys.next();
                                     // Log.i("Websocket", "print the key: " + key + "<=>" + allOnlineUsers.getString(key));
                                     usersList.add(new String(allOnlineUsers.getString(key)));
                                 }
-                            } catch (Exception e) {
-                                Log.i("Websocket", e.toString());
-                            }
-                            ;
+                            } catch(Exception e) { Log.i("Websocket", e.toString()); };
 
 
                             // update UI
@@ -122,10 +143,9 @@ public class SecretListActivity extends Activity {
                             });
                         }
                     }
-                } catch (JSONException e) {
+                } catch( JSONException e ) {
                     Log.i("Websocket", "Invalid JSON message");
-                }
-                ;
+                };
                 Log.i("Websocket", s);
             }
 
@@ -142,6 +162,13 @@ public class SecretListActivity extends Activity {
 
         Log.i("Websocket", "connecting");
         mWebSocketClient.connect();
+    }
+
+    public void sendMessage() {
+        EditText editText = (EditText)findViewById(R.id.messageField);
+        String msg = editText.getText().toString();
+        mWebSocketClient.send(msg);
+        editText.setText("");
     }
 
 }

@@ -31,7 +31,8 @@
             android:label="Register New Account" />
         <activity
             android:name="com.example.secret10.SecretListActivity"
-            android:label="Register New Account" />
+            android:icon="@drawable/person"
+            android:label="Contacts" />
     </application>
 
 </manifest>

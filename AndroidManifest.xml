@@ -28,7 +28,8 @@
         <activity android:name=".RegisterActivity"
                   android:label="Register New Account"></activity>
         <activity android:name=".SecretListActivity"
-                  android:label="Register New Account"></activity>
+                    android:icon="@drawable/person"
+                  android:label="Contacts"></activity>
     </application>
 
 </manifest>

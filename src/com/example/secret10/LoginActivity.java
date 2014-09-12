@@ -28,8 +28,8 @@ import android.widget.TextView;
 
 public class LoginActivity extends Activity {
 	
-	
-	private final String LOGIN_URL = "http://192.168.1.68:3000/login";
+	public static final String HOST = "172.16.21.119";
+	private final String LOGIN_URL = "http://" + HOST + ":3000/login";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
