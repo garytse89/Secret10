@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -51,7 +52,11 @@ public class SecretListActivity extends Activity {
         listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("Websocket", "Selected: " + listView.getItemAtPosition(position));
+                String contact = (String) listView.getItemAtPosition(position);
+                Log.i("Websocket", "Selected: " + contact);
+                Intent i = new Intent(getApplicationContext(), ChatActivity.class);
+                i.putExtra("contact", contact);
+                startActivity(i);
             }
         });
     }

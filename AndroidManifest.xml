@@ -23,13 +23,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        <!--  Entry for RegisterActivity.class -->
+
         <activity android:name=".RegisterActivity"
                   android:label="Register New Account"></activity>
+
         <activity android:name=".SecretListActivity"
                     android:icon="@drawable/person"
                   android:label="Contacts"></activity>
+        <activity android:name=".ChatActivity"
+            android:icon="@drawable/chat"
+            android:label=""></activity>
     </application>
 
 </manifest>

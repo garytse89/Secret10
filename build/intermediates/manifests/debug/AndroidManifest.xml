@@ -24,8 +24,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Entry for RegisterActivity.class -->
         <activity
             android:name="com.example.secret10.RegisterActivity"
             android:label="Register New Account" />
@@ -33,6 +31,10 @@
             android:name="com.example.secret10.SecretListActivity"
             android:icon="@drawable/person"
             android:label="Contacts" />
+        <activity
+            android:name="com.example.secret10.ChatActivity"
+            android:icon="@drawable/chat"
+            android:label="" />
     </application>
 
 </manifest>

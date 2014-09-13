@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,14 +32,15 @@ public class ChatActivity extends Activity  {
     private WebSocketClient mWebSocketClient;
 
     ListView listView;
-    List<String> usersList = new ArrayList<String>();
+    List<String> messageList = new ArrayList<String>();
+    String contactName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat);
 
-        listView = (ListView) findViewById(R.id.contactList);
+        listView = (ListView) findViewById(R.id.messageList);
         Button sendBtn = (Button) findViewById(R.id.sendBtn);
         sendBtn.setOnClickListener(new View.OnClickListener() {
 
@@ -48,12 +50,17 @@ public class ChatActivity extends Activity  {
             }
         });
 
-        connectWebSocket();
-
+        // set action bar name based on the passed in contact name (from bundle)
+        try {
+            contactName = getIntent().getStringExtra("contact");
+            setTitle(contactName);
+        } catch(Exception e) {
+            Log.e("chat", e.toString());
+        }
 
         // populate list view with array of strings
         // define an adapter and attach it to listview
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, usersList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, messageList);
         listView.setAdapter(adapter);
 
         // set listener on listView
@@ -96,56 +103,22 @@ public class ChatActivity extends Activity  {
                     // if new incoming message
                     if(!eventType.isEmpty()) {
                         Log.i("Websocket", eventType);
-                        /**
-                         if(eventType.equals("message")) {
-                         runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                        try {
-                        String msg = obj.getString("data");
-                        String sender = obj.getString("user");
-                        addToList(sender + ": " + msg);
-                        } catch(Exception e){};
-
-                        }
-                        });
-                         **/
-
-                        if(eventType.equals("update_userlist")) {
-                            Log.i("Websocket", "update_userlist");
-                            final Context context = getApplicationContext();
-                            final CharSequence text = "user joined or left";
-                            final int duration = Toast.LENGTH_SHORT;
-
-                            // users list
-                            ArrayList<String> users = new ArrayList<String>();
-
-                            try {
-                                // parse the JSON object within the message that contains associative array of users
-                                JSONObject allOnlineUsers = new JSONObject(obj.getString("data"));
-                                Iterator<?> keys = allOnlineUsers.keys();
-
-                                while( keys.hasNext() ) {
-                                    String key = (String)keys.next();
-                                    // Log.i("Websocket", "print the key: " + key + "<=>" + allOnlineUsers.getString(key));
-                                    usersList.add(new String(allOnlineUsers.getString(key)));
-                                }
-                            } catch(Exception e) { Log.i("Websocket", e.toString()); };
-
-
-                            // update UI
+                        if(eventType.equals("message")) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    //stuff that updates ui
-                                    listView.invalidateViews();
+                                    try {
+                                        String msg = obj.getString("data");
+                                        String sender = obj.getString("user");
+                                        addToList(sender + ": " + msg);
+                                    } catch (Exception e) {
+                                    }
+                                    ;
                                 }
                             });
                         }
                     }
-                } catch( JSONException e ) {
-                    Log.i("Websocket", "Invalid JSON message");
-                };
+                } catch(Exception e){};
                 Log.i("Websocket", s);
             }
 
@@ -162,6 +135,18 @@ public class ChatActivity extends Activity  {
 
         Log.i("Websocket", "connecting");
         mWebSocketClient.connect();
+    }
+
+    public void addToList(String msg) {
+        messageList.add(msg);
+        // update UI
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //stuff that updates ui
+                listView.invalidateViews();
+            }
+        });
     }
 
     public void sendMessage() {
