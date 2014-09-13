@@ -79,7 +79,7 @@ public class ChatActivity extends Activity  {
         Log.i("Websocket", "initiate");
         URI uri;
         try {
-            uri = new URI("ws://" + LoginActivity.HOST + ":8080");
+            uri = new URI("ws://" + InitialActivity.HOST + ":8080");
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return;

@@ -14,9 +14,12 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -27,9 +30,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 public class LoginActivity extends Activity {
-	
-	public static final String HOST = "172.16.21.119";
-	private final String LOGIN_URL = "http://" + HOST + ":3000/login";
+
+	private final String LOGIN_URL = "http://" + InitialActivity.HOST + ":3000/login";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +92,6 @@ public class LoginActivity extends Activity {
 	
 	// defined methods
 	public void login(String gender, String country) throws UnsupportedEncodingException {
-		Log.d("login", "login() inside");
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpPost post = new HttpPost(LOGIN_URL);
 		ResponseHandler<String> handler = new BasicResponseHandler(); 
@@ -104,18 +105,35 @@ public class LoginActivity extends Activity {
 		
         try {  
             String result = httpclient.execute(post, handler);
-            
-            if( result.equals("ok") ) { // don't use == for string equality
-            	Log.d("login", "sign up ok, load next page");
-            	Intent i = new Intent(getApplicationContext(), SecretListActivity.class);
-				startActivity(i);					
+            Log.d("login", result);
+
+            if( result.equals("Invalid fields") ) {
+                throw new Exception("Gender or Country not entered properly");
             }
+
+            // first time sign up, store username and user_id
+            JSONObject userInfo = new JSONObject(result);
+            String username = userInfo.getString("username");
+            String userID = userInfo.getString("user_id");
+            Log.d("login", "Parsed into username = " + username + ", user_id = " + userID);
+
+            SQLiteDatabase mydatabase = openOrCreateDatabase("secret10", MODE_PRIVATE, null);
+            mydatabase.execSQL("CREATE TABLE IF NOT EXISTS UserInfo(Username VARCHAR, UserID VARCHAR);");
+            mydatabase.execSQL("DELETE FROM UserInfo;"); // only store one username/userID pair
+            mydatabase.execSQL("INSERT INTO UserInfo VALUES('" + username + "', '" + userID + "');");
+
+            Cursor resultSet = mydatabase.rawQuery("Select * from UserInfo",null);
+            resultSet.moveToFirst();
+
+            Log.d("login", "First result in local DB = " + username + ", " + userID + ", and number of rows = " + resultSet.getCount());
+
+            Log.d("login", "sign up ok, load next page");
+            Intent i = new Intent(getApplicationContext(), SecretListActivity.class);
+			startActivity(i);
             
-        } catch (ClientProtocolException e) {  
-            e.printStackTrace();  
-        } catch (IOException e) {  
-            e.printStackTrace();  
-        }  
+        } catch (Exception e) {
+            Log.d("Exception at the bottom of LoginActivity", e.toString());
+        };
         httpclient.getConnectionManager().shutdown();
 	}
 }
