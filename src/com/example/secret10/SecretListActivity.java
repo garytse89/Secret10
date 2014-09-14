@@ -105,6 +105,10 @@ public class SecretListActivity extends Activity {
                                 JSONObject allOnlineUsers = new JSONObject(obj.getString("data"));
                                 Iterator<?> keys = allOnlineUsers.keys(); // keys are the userIDs, so allOnlineUsers.getString(key) gives the username
 
+                                // reinitialize both tables or else you'll get duplicates
+                                usersList = new ArrayList<String>();
+                                usersTable = new Hashtable();
+
                                 while (keys.hasNext()) {
                                     String key = (String) keys.next();
                                     // Log.i("Websocket", "print the key: " + key + "<=>" + allOnlineUsers.getString(key));
