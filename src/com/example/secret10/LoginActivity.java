@@ -114,7 +114,12 @@ public class LoginActivity extends Activity {
             // first time sign up, store username and user_id
             JSONObject userInfo = new JSONObject(result);
             String username = userInfo.getString("username");
+
+
             String userID = userInfo.getString("user_id");
+            // set userID in memory
+            InitialActivity.myUserID = userID;
+
             Log.d("login", "Parsed into username = " + username + ", user_id = " + userID);
 
             SQLiteDatabase mydatabase = openOrCreateDatabase("secret10", MODE_PRIVATE, null);

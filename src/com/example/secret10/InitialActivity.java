@@ -11,12 +11,14 @@ public class InitialActivity extends Activity {
 
 
     public static final String HOST = "192.168.1.68";
-
+    public static SQLiteDatabase mydatabase;
+    public static String myUserID;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.initial);
-        SQLiteDatabase mydatabase = openOrCreateDatabase("secret10", MODE_PRIVATE, null);
+
+        mydatabase = openOrCreateDatabase("secret10", MODE_PRIVATE, null);
 
         // for testing only
         mydatabase.execSQL("DROP TABLE IF EXISTS UserInfo;"); // uncomment to force sign up again
@@ -30,6 +32,8 @@ public class InitialActivity extends Activity {
             Log.i("database", username);
             Log.i("database", userID);
             Log.i("database", "Number of rows = " + resultSet.getCount());
+
+            myUserID = userID;
         } catch(Exception e) {
             //Inserting delay here
             try {

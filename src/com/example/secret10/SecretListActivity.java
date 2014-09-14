@@ -3,6 +3,7 @@ package com.example.secret10;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,10 +30,12 @@ import android.widget.Toast;
 
 public class SecretListActivity extends Activity {
 
-    private WebSocketClient mWebSocketClient;
+    public static WebSocketClient mWebSocketClient;
 
     ListView listView;
-    List<String> usersList = new ArrayList<String>();
+    List<String> usersList = new ArrayList<String>(); // for populating the list view
+    Hashtable usersTable = new Hashtable(); // same as above, but also contains the user IDs. Note that this table is the opposite of
+    // the server's usernames table; the key here is the usernames, and the value is the userIDs
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +55,11 @@ public class SecretListActivity extends Activity {
         listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String contact = (String) listView.getItemAtPosition(position);
-                Log.i("Websocket", "Selected: " + contact);
+                String username = (String) listView.getItemAtPosition(position);
+                Log.i("Websocket", "Selected: " + username);
                 Intent i = new Intent(getApplicationContext(), ChatActivity.class);
-                i.putExtra("contact", contact);
+                i.putExtra("username", username);
+                i.putExtra("userID", (String) usersTable.get(username)); // get userID from hashtable
                 startActivity(i);
             }
         });
@@ -96,18 +100,18 @@ public class SecretListActivity extends Activity {
                             final CharSequence text = "user joined or left";
                             final int duration = Toast.LENGTH_SHORT;
 
-                            // users list
-                            ArrayList<String> users = new ArrayList<String>();
-
                             try {
                                 // parse the JSON object within the message that contains associative array of users
                                 JSONObject allOnlineUsers = new JSONObject(obj.getString("data"));
-                                Iterator<?> keys = allOnlineUsers.keys();
+                                Iterator<?> keys = allOnlineUsers.keys(); // keys are the userIDs, so allOnlineUsers.getString(key) gives the username
 
                                 while (keys.hasNext()) {
                                     String key = (String) keys.next();
                                     // Log.i("Websocket", "print the key: " + key + "<=>" + allOnlineUsers.getString(key));
-                                    usersList.add(new String(allOnlineUsers.getString(key)));
+                                    String oneUsername = allOnlineUsers.getString(key);
+                                    String oneUserID = key;
+                                    usersList.add(oneUsername);
+                                    usersTable.put(oneUsername, oneUserID);
                                 }
                             } catch (Exception e) {
                                 Log.i("Websocket", e.toString());

@@ -29,11 +29,10 @@ import android.widget.Toast;
 
 public class ChatActivity extends Activity  {
 
-    private WebSocketClient mWebSocketClient;
-
     ListView listView;
     List<String> messageList = new ArrayList<String>();
-    String contactName;
+    String targetUsername;
+    String targetUserID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +51,9 @@ public class ChatActivity extends Activity  {
 
         // set action bar name based on the passed in contact name (from bundle)
         try {
-            contactName = getIntent().getStringExtra("contact");
-            setTitle(contactName);
+            targetUsername = getIntent().getStringExtra("username");
+            targetUserID = getIntent().getStringExtra("userID");
+            setTitle(targetUsername);
         } catch(Exception e) {
             Log.e("chat", e.toString());
         }
@@ -75,67 +75,67 @@ public class ChatActivity extends Activity  {
         });
     }
 
-    private void connectWebSocket() {
-        Log.i("Websocket", "initiate");
-        URI uri;
-        try {
-            uri = new URI("ws://" + InitialActivity.HOST + ":8080");
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        mWebSocketClient = new WebSocketClient(uri) {
-            @Override
-            public void onOpen(ServerHandshake serverHandshake) {
-                Log.i("Websocket", "Opened");
-                // mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
-            }
-
-            @Override
-            public void onMessage(String s) {
-                final String message = s;
-                String eventType = null;
-                try {
-                    final JSONObject obj = new JSONObject(s);
-                    eventType = obj.getString("event");
-
-                    // if new incoming message
-                    if(!eventType.isEmpty()) {
-                        Log.i("Websocket", eventType);
-                        if(eventType.equals("message")) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        String msg = obj.getString("data");
-                                        String sender = obj.getString("user");
-                                        addToList(sender + ": " + msg);
-                                    } catch (Exception e) {
-                                    }
-                                    ;
-                                }
-                            });
-                        }
-                    }
-                } catch(Exception e){};
-                Log.i("Websocket", s);
-            }
-
-            @Override
-            public void onClose(int i, String s, boolean b) {
-                Log.i("Websocket", "Closed " + s);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.i("Websocket", "Error " + e.getMessage());
-            }
-        };
-
-        Log.i("Websocket", "connecting");
-        mWebSocketClient.connect();
-    }
+//    private void connectWebSocket() {
+//        Log.i("Websocket", "initiate");
+//        URI uri;
+//        try {
+//            uri = new URI("ws://" + InitialActivity.HOST + ":8080");
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//            return;
+//        }
+//
+//        mWebSocketClient = new WebSocketClient(uri) {
+//            @Override
+//            public void onOpen(ServerHandshake serverHandshake) {
+//                Log.i("Websocket", "Opened");
+//                // mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
+//            }
+//
+//            @Override
+//            public void onMessage(String s) {
+//                final String message = s;
+//                String eventType = null;
+//                try {
+//                    final JSONObject obj = new JSONObject(s);
+//                    eventType = obj.getString("event");
+//
+//                    // if new incoming message
+//                    if(!eventType.isEmpty()) {
+//                        Log.i("Websocket", eventType);
+//                        if(eventType.equals("message")) {
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    try {
+//                                        String msg = obj.getString("data");
+//                                        String sender = obj.getString("user");
+//                                        addToList(sender + ": " + msg);
+//                                    } catch (Exception e) {
+//                                    }
+//                                    ;
+//                                }
+//                            });
+//                        }
+//                    }
+//                } catch(Exception e){};
+//                Log.i("Websocket", s);
+//            }
+//
+//            @Override
+//            public void onClose(int i, String s, boolean b) {
+//                Log.i("Websocket", "Closed " + s);
+//            }
+//
+//            @Override
+//            public void onError(Exception e) {
+//                Log.i("Websocket", "Error " + e.getMessage());
+//            }
+//        };
+//
+//        Log.i("Websocket", "connecting");
+//        mWebSocketClient.connect();
+//    }
 
     public void addToList(String msg) {
         messageList.add(msg);
@@ -152,7 +152,14 @@ public class ChatActivity extends Activity  {
     public void sendMessage() {
         EditText editText = (EditText)findViewById(R.id.messageField);
         String msg = editText.getText().toString();
-        mWebSocketClient.send(msg);
+
+        // construct appropriate JSON object as a string
+        String messageObj = "{\"event\":\"message\", " +
+                            "\"data\": { \"from\": \"" + InitialActivity.myUserID + "\" ," +
+                                         "\"to\" : \"" + targetUserID + "\"," +
+                                         "\"message\": \"" + msg + "\"} }";
+        Log.i("Websocket", "sending out this message : " + messageObj);
+        SecretListActivity.mWebSocketClient.send(messageObj);
         editText.setText("");
     }
 
