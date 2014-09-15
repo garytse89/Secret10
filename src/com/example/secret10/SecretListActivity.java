@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -79,7 +80,9 @@ public class SecretListActivity extends Activity {
             @Override
             public void onOpen(ServerHandshake serverHandshake) {
                 Log.i("Websocket", "Opened");
-                // mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
+                String registerSocket = "{ \"event\": \"register\", \"data\": \"" + InitialActivity.myUserID + "\" }";
+                mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
+                mWebSocketClient.send(registerSocket);
             }
 
             @Override
@@ -105,23 +108,20 @@ public class SecretListActivity extends Activity {
                                 JSONObject allOnlineUsers = new JSONObject(obj.getString("data"));
                                 Iterator<?> keys = allOnlineUsers.keys(); // keys are the userIDs, so allOnlineUsers.getString(key) gives the username
 
-                                // reinitialize both tables or else you'll get duplicates
-                                usersList = new ArrayList<String>();
-                                usersTable = new Hashtable();
-
                                 while (keys.hasNext()) {
                                     String key = (String) keys.next();
                                     // Log.i("Websocket", "print the key: " + key + "<=>" + allOnlineUsers.getString(key));
                                     String oneUsername = allOnlineUsers.getString(key);
                                     String oneUserID = key;
-                                    usersList.add(oneUsername);
-                                    usersTable.put(oneUsername, oneUserID);
+                                    if(!usersList.contains(oneUsername))
+                                        usersList.add(oneUsername);
+                                    if(!usersTable.containsKey(oneUsername))
+                                        usersTable.put(oneUsername, oneUserID);
                                 }
                             } catch (Exception e) {
                                 Log.i("Websocket", e.toString());
                             }
                             ;
-
 
                             // update UI
                             runOnUiThread(new Runnable() {
@@ -131,6 +131,20 @@ public class SecretListActivity extends Activity {
                                     listView.invalidateViews();
                                 }
                             });
+                        } else if(eventType.equals("chat_message")) {
+                            Log.i("Websocket", "chat message part");
+                            try {
+                                JSONArray messages = obj.getJSONArray("messages");
+                                ChatActivity.messageList = new ArrayList<String>();
+                                for( int i=0; i<messages.length(); i++ ) {
+                                    // append to ChatActivity listView of messages (... but probably the wrong one)
+                                    String msg = messages.getJSONObject(i).getString("message");
+                                    Log.i("Websocket", "Messages received from log: " + i + ") " + msg);
+                                    ChatActivity.messageList.add(msg);
+                                }
+                            } catch(Exception e) {
+                                Log.i("Websocket", e.toString() + " at chat_message part");
+                            }
                         }
                     }
                 } catch (JSONException e) {

@@ -30,7 +30,7 @@ import android.widget.Toast;
 public class ChatActivity extends Activity  {
 
     ListView listView;
-    List<String> messageList = new ArrayList<String>();
+    public static List<String> messageList = new ArrayList<String>();
     String targetUsername;
     String targetUserID;
 
