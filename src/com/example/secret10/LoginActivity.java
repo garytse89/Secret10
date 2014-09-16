@@ -34,12 +34,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 public class LoginActivity extends Activity {
 
 	private final String LOGIN_URL = "http://" + InitialActivity.HOST + ":3000/login";
+    private final String GCM_URL = "http://" + InitialActivity.HOST + ":3000/gcm";
 
     /* GCM STUFF */
 
@@ -97,6 +99,10 @@ public class LoginActivity extends Activity {
                     @Override
                     public void run() {
                         try {
+                            regid = getRegistrationId(context);
+                            if (regid.isEmpty()) {
+                                registerInBackground();
+                            }
                             login(mGender.getText().toString(), mCountry.getText().toString());
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -154,8 +160,10 @@ public class LoginActivity extends Activity {
 		List<NameValuePair> listData = new ArrayList<NameValuePair>();
 		listData.add(new BasicNameValuePair("gender", gender));
 		listData.add(new BasicNameValuePair("country", country));
+        listData.add(new BasicNameValuePair("regid", regid));
 		post.setEntity(new UrlEncodedFormEntity(listData));
-		
+        Log.d("login", "Execute signup with regid = " + regid);
+
         try {  
             String result = httpclient.execute(post, handler);
             Log.d("login", result);
@@ -261,10 +269,11 @@ public class LoginActivity extends Activity {
                     Log.i(TAG, "registerInBackground() googogo");
                     regid = gcm.register(SENDER_ID);
                     msg = "Device registered, registration ID=" + regid;
+                    Log.i(TAG, msg);
 
                     // You should send the registration ID to your server over HTTP, so it
                     // can use GCM/HTTP or CCS to send messages to your app.
-                    sendRegistrationIdToBackend();
+                    // sendRegistrationIdToBackend(); // do this in Login instead
 
                     // For this demo: we don't need to send it because the device will send
                     // upstream messages to a server that echo back the message using the
@@ -322,8 +331,28 @@ public class LoginActivity extends Activity {
      * messages to your app. Not needed for this demo since the device sends upstream messages
      * to a server that echoes back the message using the 'from' address in the message.
      */
-    private void sendRegistrationIdToBackend() {
+    private void sendRegistrationIdToBackend() throws UnsupportedEncodingException {
         Log.i(TAG, "sendRegistrationToBackend()");
         // code here
+
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost post = new HttpPost(GCM_URL);
+        ResponseHandler<String> handler = new BasicResponseHandler();
+
+        // add data in List<NameValuePair> form then converted to urlencodedformentity
+        // and finally strapped onto the post
+        List<NameValuePair> listData = new ArrayList<NameValuePair>();
+        listData.add(new BasicNameValuePair("userID", InitialActivity.myUserID));
+        listData.add(new BasicNameValuePair("regid", regid));
+        post.setEntity(new UrlEncodedFormEntity(listData));
+
+        Log.i(TAG, "send out POST request with userID = " + InitialActivity.myUserID + ", regid = " +
+                   regid);
+        try {
+            String result = httpclient.execute(post, handler);
+            Log.i(TAG, result);
+        } catch(Exception e){
+            Log.i(TAG, "Error in posting regid to backend" + e.toString());
+        };
     }
 }

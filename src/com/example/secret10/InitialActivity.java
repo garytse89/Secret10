@@ -34,6 +34,9 @@ public class InitialActivity extends Activity {
             Log.i("database", "Number of rows = " + resultSet.getCount());
 
             myUserID = userID;
+
+            // if user already installed this app, go directly to SecretListActivity
+            // but we still need to connect to server here
         } catch(Exception e) {
             //Inserting delay here
             try {
