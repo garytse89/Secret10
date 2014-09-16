@@ -66,6 +66,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dip"
                 android:text="Sign Up"/>
+
+          <Button android:id="@+id/testGCM"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dip"
+                android:text="Test GCM"/>
           
           <!-- Link to Registration Screen -->
           <TextView android:id="@+id/link_to_register"
