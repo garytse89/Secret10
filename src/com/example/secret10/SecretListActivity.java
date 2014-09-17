@@ -1,5 +1,10 @@
 package com.example.secret10;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -16,8 +21,10 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.storage.StorageManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -91,6 +98,7 @@ public class SecretListActivity extends Activity {
                 String eventType = null;
                 try {
                     final JSONObject obj = new JSONObject(s);
+                    final JSONObject data = obj.getJSONObject("data"); // everything will be inside here
                     eventType = obj.getString("event");
 
                     // if new incoming message
@@ -132,16 +140,34 @@ public class SecretListActivity extends Activity {
                                 }
                             });
                         } else if(eventType.equals("chat_message")) {
-                            Log.i("Websocket", "chat message part");
                             try {
-                                JSONArray messages = obj.getJSONArray("messages");
-                                ChatActivity.messageList = new ArrayList<String>();
-                                for( int i=0; i<messages.length(); i++ ) {
-                                    // append to ChatActivity listView of messages (... but probably the wrong one)
-                                    String msg = messages.getJSONObject(i).getString("message");
-                                    Log.i("Websocket", "Messages received from log: " + i + ") " + msg);
-                                    ChatActivity.messageList.add(msg);
+                                JSONArray messages = data.getJSONArray("messages");
+                                // store messages inside local storage - sharedPreferences, SQLite, etc.
+                                String senderID = data.getString("origin");
+
+                                // refactor this later inside a separate class
+                                SharedPreferences chatDocs = getSharedPreferences("chatDocs", 0);
+                                SharedPreferences.Editor editor = chatDocs.edit();
+
+                                String chatLog = chatDocs.getString(senderID, "");
+                                Log.i("Websocket", "existing chat log = " + chatLog);
+                                JSONArray chatLogArray;
+
+                                if(!chatLog.isEmpty()) {
+                                    // convert chatLog from String to JSONArray
+                                     chatLogArray = new JSONArray(chatLog);
+                                } else {
+                                    chatLogArray = new JSONArray();
                                 }
+
+                                chatLogArray.put(messages.getJSONObject(0).getString("message")); // only one message per incoming payload
+                                // convert back to String
+                                chatLog = chatLogArray.toString();
+
+                                // store into SharedPreferences again
+                                Log.i("Websocket", "new chat log to store = " + chatLog);
+                                editor.putString(senderID, chatLog);
+                                editor.commit();
                             } catch(Exception e) {
                                 Log.i("Websocket", e.toString() + " at chat_message part");
                             }
@@ -167,6 +193,35 @@ public class SecretListActivity extends Activity {
 
         Log.i("Websocket", "connecting");
         mWebSocketClient.connect();
+    }
+
+    /*
+    Saves a chat document based on sender's ID
+    */
+    public void saveChat(List<String> messageList, String senderID) {
+        try {
+            FileOutputStream fos = openFileOutput(senderID, Context.MODE_PRIVATE);
+            fos.write(messageList.toString().getBytes());
+            fos.close();
+        }
+        catch (Exception e) {
+            Log.e("InternalStorage", e.toString());
+        }
+    }
+
+    public ArrayList<String> readChat(String senderID) {
+        ArrayList<String> toReturn = new ArrayList<String>();
+        FileInputStream fis;
+        try {
+            fis = openFileInput(senderID);
+            ObjectInputStream oi = new ObjectInputStream(fis);
+            toReturn = (ArrayList<String>) oi.readObject();
+            oi.close();
+        } catch (Exception e) {
+            Log.e("InternalStorage", e.toString());
+        }
+        return toReturn; // if chat document not found (if you click on a contact you've never chatted with)
+        // then return an empty ArrayList
     }
 
 }
