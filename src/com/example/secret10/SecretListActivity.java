@@ -87,8 +87,9 @@ public class SecretListActivity extends Activity {
             @Override
             public void onOpen(ServerHandshake serverHandshake) {
                 Log.i("Websocket", "Opened");
-                String registerSocket = "{ \"event\": \"register\", \"data\": \"" + InitialActivity.myUserID + "\" }";
-                mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
+                String registerSocket = "{ \"event\": \"register\", \"user_id\": \"" + InitialActivity.myUserID + "\", " +
+                                        "\"username\": \"" + InitialActivity.myUsername + "\" }";
+                //mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
                 mWebSocketClient.send(registerSocket);
             }
 
@@ -106,10 +107,14 @@ public class SecretListActivity extends Activity {
                         Log.i("Websocket", eventType);
 
                         if (eventType.equals("update_userlist")) {
-                            Log.i("Websocket", "update_userlist");
+                            Log.i("Websocket", "update_userlist start");
                             final Context context = getApplicationContext();
                             final CharSequence text = "user joined or left";
                             final int duration = Toast.LENGTH_SHORT;
+
+                            // empty out existing userlist and table
+                            usersList.clear();
+                            usersTable.clear();
 
                             try {
                                 // parse the JSON object within the message that contains associative array of users
@@ -121,15 +126,23 @@ public class SecretListActivity extends Activity {
                                     // Log.i("Websocket", "print the key: " + key + "<=>" + allOnlineUsers.getString(key));
                                     String oneUsername = allOnlineUsers.getString(key);
                                     String oneUserID = key;
-                                    if(!usersList.contains(oneUsername))
+
+                                    // do not display yourself as a contact
+                                    Log.i("Websocket", "add this userID with this username: " + oneUserID + " - " + oneUsername);
+                                    if(!oneUserID.equals(InitialActivity.myUserID)) {
                                         usersList.add(oneUsername);
-                                    if(!usersTable.containsKey(oneUsername))
                                         usersTable.put(oneUsername, oneUserID);
+                                    }
                                 }
                             } catch (Exception e) {
-                                Log.i("Websocket", e.toString());
+                                Log.i("Websocket", "Update user list exception" + e.toString());
                             }
                             ;
+
+                            Log.i("Websocket", "update_userlist finish, length of usersList = " + usersList.size());
+                            for( String user : usersList ) {
+                                Log.i("Websocket", "u should see a contact called = " + user);
+                            }
 
                             // update UI
                             runOnUiThread(new Runnable() {

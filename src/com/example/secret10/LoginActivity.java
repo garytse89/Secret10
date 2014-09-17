@@ -180,6 +180,7 @@ public class LoginActivity extends Activity {
             String userID = userInfo.getString("user_id");
             // set userID in memory
             InitialActivity.myUserID = userID;
+            InitialActivity.myUsername = username;
 
             Log.d("login", "Parsed into username = " + username + ", user_id = " + userID);
 

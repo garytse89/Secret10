@@ -13,6 +13,7 @@ public class InitialActivity extends Activity {
     public static final String HOST = "192.168.1.68";
     public static SQLiteDatabase mydatabase;
     public static String myUserID;
+    public static String myUsername;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

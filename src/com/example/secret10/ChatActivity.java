@@ -87,18 +87,6 @@ public class ChatActivity extends Activity  {
         });
     }
 
-    public void addToList(String msg) {
-        messageList.add(msg);
-        // update UI
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                //stuff that updates ui
-                listView.invalidateViews();
-            }
-        });
-    }
-
     public void sendMessage() {
         EditText editText = (EditText)findViewById(R.id.messageField);
         String msg = editText.getText().toString();
