@@ -8,12 +8,14 @@ import java.util.List;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,12 +56,22 @@ public class ChatActivity extends Activity  {
             targetUsername = getIntent().getStringExtra("username");
             targetUserID = getIntent().getStringExtra("userID");
             setTitle(targetUsername);
+
+            // populate list view with chat messages, by retrieving the chat log from sharedPreferences
+            SharedPreferences chatDocs = getSharedPreferences("chatDocs", 0);
+            String chatLog = chatDocs.getString(targetUserID, "");
+            JSONArray chatMessages = new JSONArray(chatLog);
+
+            // convert String -> JSONArray -> insert each message into ArrayList
+            for (int i = 0; i < chatMessages.length(); i++) {
+                String msg = chatMessages.getString(i);
+                messageList.add(msg);
+            }
+
         } catch(Exception e) {
             Log.e("chat", e.toString());
         }
 
-        // populate list view with array of strings
-        // define an adapter and attach it to listview
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, messageList);
         listView.setAdapter(adapter);
 
@@ -74,68 +86,6 @@ public class ChatActivity extends Activity  {
             }
         });
     }
-
-//    private void connectWebSocket() {
-//        Log.i("Websocket", "initiate");
-//        URI uri;
-//        try {
-//            uri = new URI("ws://" + InitialActivity.HOST + ":8080");
-//        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-//            return;
-//        }
-//
-//        mWebSocketClient = new WebSocketClient(uri) {
-//            @Override
-//            public void onOpen(ServerHandshake serverHandshake) {
-//                Log.i("Websocket", "Opened");
-//                // mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
-//            }
-//
-//            @Override
-//            public void onMessage(String s) {
-//                final String message = s;
-//                String eventType = null;
-//                try {
-//                    final JSONObject obj = new JSONObject(s);
-//                    eventType = obj.getString("event");
-//
-//                    // if new incoming message
-//                    if(!eventType.isEmpty()) {
-//                        Log.i("Websocket", eventType);
-//                        if(eventType.equals("message")) {
-//                            runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    try {
-//                                        String msg = obj.getString("data");
-//                                        String sender = obj.getString("user");
-//                                        addToList(sender + ": " + msg);
-//                                    } catch (Exception e) {
-//                                    }
-//                                    ;
-//                                }
-//                            });
-//                        }
-//                    }
-//                } catch(Exception e){};
-//                Log.i("Websocket", s);
-//            }
-//
-//            @Override
-//            public void onClose(int i, String s, boolean b) {
-//                Log.i("Websocket", "Closed " + s);
-//            }
-//
-//            @Override
-//            public void onError(Exception e) {
-//                Log.i("Websocket", "Error " + e.getMessage());
-//            }
-//        };
-//
-//        Log.i("Websocket", "connecting");
-//        mWebSocketClient.connect();
-//    }
 
     public void addToList(String msg) {
         messageList.add(msg);

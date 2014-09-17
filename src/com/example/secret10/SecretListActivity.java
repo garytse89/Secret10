@@ -195,33 +195,4 @@ public class SecretListActivity extends Activity {
         mWebSocketClient.connect();
     }
 
-    /*
-    Saves a chat document based on sender's ID
-    */
-    public void saveChat(List<String> messageList, String senderID) {
-        try {
-            FileOutputStream fos = openFileOutput(senderID, Context.MODE_PRIVATE);
-            fos.write(messageList.toString().getBytes());
-            fos.close();
-        }
-        catch (Exception e) {
-            Log.e("InternalStorage", e.toString());
-        }
-    }
-
-    public ArrayList<String> readChat(String senderID) {
-        ArrayList<String> toReturn = new ArrayList<String>();
-        FileInputStream fis;
-        try {
-            fis = openFileInput(senderID);
-            ObjectInputStream oi = new ObjectInputStream(fis);
-            toReturn = (ArrayList<String>) oi.readObject();
-            oi.close();
-        } catch (Exception e) {
-            Log.e("InternalStorage", e.toString());
-        }
-        return toReturn; // if chat document not found (if you click on a contact you've never chatted with)
-        // then return an empty ArrayList
-    }
-
 }
