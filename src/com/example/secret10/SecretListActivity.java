@@ -173,7 +173,8 @@ public class SecretListActivity extends Activity {
                                     chatLogArray = new JSONArray();
                                 }
 
-                                chatLogArray.put(messages.getJSONObject(0).getString("message")); // only one message per incoming payload
+                                int lastElement = messages.length()-1;
+                                chatLogArray.put(messages.getJSONObject(lastElement).getString("message")); // only one message per incoming payload
                                 // convert back to String
                                 chatLog = chatLogArray.toString();
 
@@ -181,6 +182,25 @@ public class SecretListActivity extends Activity {
                                 Log.i("Websocket", "new chat log to store = " + chatLog);
                                 editor.putString(senderID, chatLog);
                                 editor.commit();
+
+                                // refresh ChatActivity if necessary
+                                try { // because targetUserID is NullPointer if its not opened
+                                    if(senderID.equals(ChatActivity.targetUserID)) {
+                                        ChatActivity.messageList.clear();
+                                        for( int i=0; i<chatLogArray.length(); i++ ) {
+                                            ChatActivity.messageList.add(chatLogArray.getString(i));
+                                        }
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                //stuff that updates ui
+                                                ChatActivity.listView.invalidateViews();
+                                            }
+                                        });
+                                    }
+                                } catch(Exception e){
+                                    Log.i("Websocket", e.toString() + " at refreshing chat activity");
+                                };
                             } catch(Exception e) {
                                 Log.i("Websocket", e.toString() + " at chat_message part");
                             }

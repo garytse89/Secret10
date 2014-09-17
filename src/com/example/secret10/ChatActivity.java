@@ -31,10 +31,10 @@ import android.widget.Toast;
 
 public class ChatActivity extends Activity  {
 
-    ListView listView;
+    public static ListView listView;
     public static List<String> messageList = new ArrayList<String>();
-    String targetUsername;
-    String targetUserID;
+    public static String targetUsername;
+    public static String targetUserID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
