@@ -44,6 +44,7 @@ public class SecretListActivity extends Activity {
     List<String> usersList = new ArrayList<String>(); // for populating the list view
     Hashtable usersTable = new Hashtable(); // same as above, but also contains the user IDs. Note that this table is the opposite of
     // the server's usernames table; the key here is the usernames, and the value is the userIDs
+    public static Hashtable reverseUsersTable = new Hashtable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +116,7 @@ public class SecretListActivity extends Activity {
                             // empty out existing userlist and table
                             usersList.clear();
                             usersTable.clear();
+                            reverseUsersTable.clear();
 
                             try {
                                 // parse the JSON object within the message that contains associative array of users
@@ -132,6 +134,7 @@ public class SecretListActivity extends Activity {
                                     if(!oneUserID.equals(InitialActivity.myUserID)) {
                                         usersList.add(oneUsername);
                                         usersTable.put(oneUsername, oneUserID);
+                                        reverseUsersTable.put(oneUserID, oneUsername);
                                     }
                                 }
                             } catch (Exception e) {
@@ -168,13 +171,19 @@ public class SecretListActivity extends Activity {
 
                                 if(!chatLog.isEmpty()) {
                                     // convert chatLog from String to JSONArray
-                                     chatLogArray = new JSONArray(chatLog);
+                                    chatLogArray = new JSONArray(chatLog);
                                 } else {
                                     chatLogArray = new JSONArray();
                                 }
 
                                 int lastElement = messages.length()-1;
-                                chatLogArray.put(messages.getJSONObject(lastElement).getString("message")); // only one message per incoming payload
+                                // put this into the chat log array :
+                                // { "origin" : some_user_id, "message": msg contents }
+                                String chatMsg = "{\"origin\" : \"" + senderID + "\", \"message\" : \"" +
+                                        messages.getJSONObject(lastElement).getString("message") + "\"}";
+                                Log.i("Websocket", "store this message into sharedprefs = " + chatMsg);
+                                chatLogArray.put(chatMsg); // only one message per incoming payload
+
                                 // convert back to String
                                 chatLog = chatLogArray.toString();
 
@@ -188,7 +197,16 @@ public class SecretListActivity extends Activity {
                                     if(senderID.equals(ChatActivity.targetUserID)) {
                                         ChatActivity.messageList.clear();
                                         for( int i=0; i<chatLogArray.length(); i++ ) {
-                                            ChatActivity.messageList.add("Him: " + chatLogArray.getString(i));
+                                            JSONObject chatMsgJSON = new JSONObject(chatLogArray.getString(i));
+                                            String sender = chatMsgJSON.getString("origin");
+                                            String msgContents = chatMsgJSON.getString("message");
+
+                                            if(sender.equals(InitialActivity.myUserID)) {
+                                                sender = "Me";
+                                            } else {
+                                                sender = (String) reverseUsersTable.get(sender); // gets username of sender
+                                            }
+                                            ChatActivity.messageList.add(sender + ": " + msgContents);
                                         }
                                         runOnUiThread(new Runnable() {
                                             @Override

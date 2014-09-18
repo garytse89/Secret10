@@ -70,13 +70,22 @@ public class ChatActivity extends Activity  {
 
                 // convert String -> JSONArray -> insert each message into ArrayList
                 for (int i = 0; i < chatMessages.length(); i++) {
-                    String msg = chatMessages.getString(i);
-                    messageList.add(msg);
+                    JSONObject chatMsgJSON = new JSONObject(chatMessages.getString(i));
+                    String sender = chatMsgJSON.getString("origin");
+                    String msg = chatMsgJSON.getString("message");
+
+                    if(sender.equals(InitialActivity.myUserID)) {
+                        sender = "Me";
+                    } else {
+                        sender = (String) SecretListActivity.reverseUsersTable.get(sender); // gets username of sender
+                    }
+
+                    messageList.add(sender + ": " + msg);
                 }
             } // if no chat exists for this user, then the messageList should be empty
 
             Log.i("chat", "Chat loaded, message list = " + messageList.size());
-            
+
         } catch(Exception e) {
             Log.e("chat", e.toString());
         }
@@ -86,7 +95,7 @@ public class ChatActivity extends Activity  {
 
         // set listener on listView
         listView.setOnItemClickListener(new OnItemClickListener() {
-
+            // copy and paste crap
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(getApplicationContext(),
@@ -136,7 +145,10 @@ public class ChatActivity extends Activity  {
                 chatLogArray = new JSONArray();
             }
 
-            chatLogArray.put(message); // only one message per incoming payload
+            String chatMsg = "{\"origin\" : \"" + InitialActivity.myUserID + "\", \"message\" : \"" +
+                    message + "\"}";
+
+            chatLogArray.put(chatMsg); // only one message per incoming payload
             // convert back to String
             chatLog = chatLogArray.toString();
 
