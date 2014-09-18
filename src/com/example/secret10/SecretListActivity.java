@@ -188,7 +188,7 @@ public class SecretListActivity extends Activity {
                                     if(senderID.equals(ChatActivity.targetUserID)) {
                                         ChatActivity.messageList.clear();
                                         for( int i=0; i<chatLogArray.length(); i++ ) {
-                                            ChatActivity.messageList.add(chatLogArray.getString(i));
+                                            ChatActivity.messageList.add("Him: " + chatLogArray.getString(i));
                                         }
                                         runOnUiThread(new Runnable() {
                                             @Override

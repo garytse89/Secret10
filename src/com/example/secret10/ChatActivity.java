@@ -60,14 +60,23 @@ public class ChatActivity extends Activity  {
             // populate list view with chat messages, by retrieving the chat log from sharedPreferences
             SharedPreferences chatDocs = getSharedPreferences("chatDocs", 0);
             String chatLog = chatDocs.getString(targetUserID, "");
-            JSONArray chatMessages = new JSONArray(chatLog);
 
-            // convert String -> JSONArray -> insert each message into ArrayList
-            for (int i = 0; i < chatMessages.length(); i++) {
-                String msg = chatMessages.getString(i);
-                messageList.add(msg);
-            }
+            Log.i("chat", "Retrieved chat log for " + targetUsername + " : " + chatLog);
 
+            messageList.clear();
+
+            if (!chatLog.isEmpty()) {
+                JSONArray chatMessages = new JSONArray(chatLog);
+
+                // convert String -> JSONArray -> insert each message into ArrayList
+                for (int i = 0; i < chatMessages.length(); i++) {
+                    String msg = chatMessages.getString(i);
+                    messageList.add(msg);
+                }
+            } // if no chat exists for this user, then the messageList should be empty
+
+            Log.i("chat", "Chat loaded, message list = " + messageList.size());
+            
         } catch(Exception e) {
             Log.e("chat", e.toString());
         }
@@ -99,6 +108,52 @@ public class ChatActivity extends Activity  {
         Log.i("Websocket", "sending out this message : " + messageObj);
         SecretListActivity.mWebSocketClient.send(messageObj);
         editText.setText("");
+
+        // append your own message
+        appendMessage(msg);
+    }
+
+    /*
+    When we send a message we also have to update the local storage (SharedPreferences) version of it
+
+    When a new chat message comes into Websocket, we're only updating it with the latest message
+
+     */
+    public void appendMessage(String message) {
+        messageList.add("Me: " + message);
+
+        SharedPreferences chatDocs = getSharedPreferences("chatDocs", 0);
+        SharedPreferences.Editor editor = chatDocs.edit();
+
+        String chatLog = chatDocs.getString(targetUserID, "");
+        JSONArray chatLogArray;
+
+        try {
+            if (!chatLog.isEmpty()) {
+                // convert chatLog from String to JSONArray
+                chatLogArray = new JSONArray(chatLog);
+            } else {
+                chatLogArray = new JSONArray();
+            }
+
+            chatLogArray.put(message); // only one message per incoming payload
+            // convert back to String
+            chatLog = chatLogArray.toString();
+
+            // store into SharedPreferences again
+            Log.i("Websocket", "new chat log to store = " + chatLog);
+            editor.putString(targetUserID, chatLog);
+            editor.commit();
+        } catch(Exception e) {
+            Log.i("Chat", e.toString());
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ChatActivity.listView.invalidateViews();
+            }
+        });
     }
 
 }
