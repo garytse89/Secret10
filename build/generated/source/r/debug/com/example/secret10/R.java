@@ -1124,11 +1124,11 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f070018;
         public static final int action_menu_presenter=0x7f070019;
         public static final int action_mode_close_button=0x7f070027;
-        public static final int action_settings=0x7f07004e;
+        public static final int action_settings=0x7f07004c;
         public static final int activity_chooser_view_content=0x7f070028;
         public static final int always=0x7f070012;
         public static final int beginning=0x7f07000a;
-        public static final int btnRegister=0x7f07004c;
+        public static final int btnRegister=0x7f07004a;
         public static final int checkbox=0x7f070030;
         public static final int collapseActionView=0x7f070014;
         public static final int contactList=0x7f070042;
@@ -1149,8 +1149,7 @@ containing a value of this type.
         public static final int icon=0x7f07002d;
         public static final int ifRoom=0x7f070011;
         public static final int image=0x7f07002a;
-        public static final int link_to_login=0x7f07004d;
-        public static final int link_to_register=0x7f070048;
+        public static final int link_to_login=0x7f07004b;
         public static final int listMode=0x7f070001;
         public static final int list_item=0x7f07002c;
         public static final int messageField=0x7f070040;
@@ -1162,9 +1161,9 @@ containing a value of this type.
         public static final int progress_circular=0x7f07001b;
         public static final int progress_horizontal=0x7f07001c;
         public static final int radio=0x7f070032;
-        public static final int reg_email=0x7f07004a;
-        public static final int reg_fullname=0x7f070049;
-        public static final int reg_password=0x7f07004b;
+        public static final int reg_email=0x7f070048;
+        public static final int reg_fullname=0x7f070047;
+        public static final int reg_password=0x7f070049;
         public static final int satellite=0x7f07000d;
         public static final int search_badge=0x7f070035;
         public static final int search_bar=0x7f070034;
@@ -1186,7 +1185,6 @@ containing a value of this type.
         public static final int submit_area=0x7f07003c;
         public static final int tabMode=0x7f070002;
         public static final int terrain=0x7f07000e;
-        public static final int testGCM=0x7f070047;
         public static final int title=0x7f07002e;
         public static final int top_action_bar=0x7f070023;
         public static final int up=0x7f070024;

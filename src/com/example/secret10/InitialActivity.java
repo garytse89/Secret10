@@ -10,7 +10,7 @@ import android.util.Log;
 public class InitialActivity extends Activity {
 
 
-    public static final String HOST = "192.168.1.68";
+    public static final String HOST = "128.199.223.31";
     public static SQLiteDatabase mydatabase;
     public static String myUserID;
     public static String myUsername;
@@ -22,7 +22,7 @@ public class InitialActivity extends Activity {
         mydatabase = openOrCreateDatabase("secret10", MODE_PRIVATE, null);
 
         // for testing only
-        mydatabase.execSQL("DROP TABLE IF EXISTS UserInfo;"); // uncomment to force sign up again
+        // mydatabase.execSQL("DROP TABLE IF EXISTS UserInfo;"); // uncomment to force sign up again
 
         try {
             Cursor resultSet = mydatabase.rawQuery("Select * from UserInfo",null);
@@ -38,6 +38,8 @@ public class InitialActivity extends Activity {
 
             // if user already installed this app, go directly to SecretListActivity
             // but we still need to connect to server here
+            Intent i = new Intent(getApplicationContext(), SecretListActivity.class);
+            startActivity(i);
         } catch(Exception e) {
             //Inserting delay here
             try {
@@ -49,7 +51,7 @@ public class InitialActivity extends Activity {
             Intent i = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(i);
         }
-
+        finish();
     }
 
 }

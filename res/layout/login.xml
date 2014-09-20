@@ -57,8 +57,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dip"
-                android:singleLine="true"
-                android:password="true"/>
+                android:singleLine="true"/>
           
           <!-- Sign up button -->
           <Button android:id="@+id/signUpLogin"
@@ -66,23 +65,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dip"
                 android:text="Sign Up"/>
-
-          <Button android:id="@+id/testGCM"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dip"
-                android:text="Test GCM"/>
-          
-          <!-- Link to Registration Screen -->
-          <TextView android:id="@+id/link_to_register"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dip"
-                android:layout_marginBottom="40dip"
-                android:text="New to Secret10? Register Here."
-                android:gravity="center"
-                android:textSize="20dip"
-                android:textColor="#0b84aa"/>
  
 		</LinearLayout>
         <!-- Login Form Ends -->

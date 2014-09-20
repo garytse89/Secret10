@@ -76,16 +76,7 @@ public class LoginActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
         context = getApplicationContext();
-
-		TextView registerScreen = (TextView) findViewById(R.id.link_to_register);
-		registerScreen.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent(getApplicationContext(), RegisterActivity.class);
-				startActivity(i);				
-			}
-		});
+        gcm = GoogleCloudMessaging.getInstance(this);
 		
 		final EditText mGender = (EditText) findViewById(R.id.genderField);
 		final EditText mCountry = (EditText) findViewById(R.id.countryField);
@@ -100,7 +91,7 @@ public class LoginActivity extends Activity {
                     public void run() {
                         try {
                             regid = getRegistrationId(context);
-                            if (regid.isEmpty()) {
+                            while (regid.isEmpty()) {
                                 registerInBackground();
                             }
                             login(mGender.getText().toString(), mCountry.getText().toString());
@@ -113,21 +104,6 @@ public class LoginActivity extends Activity {
                 thread.start();
 			}
 		});
-
-        /* GCM onCLICK */
-        gcm = GoogleCloudMessaging.getInstance(this);
-
-        Button testGCMBtn = (Button) findViewById(R.id.testGCM);
-        testGCMBtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v){
-                regid = getRegistrationId(context);
-                if (regid.isEmpty()) {
-                    registerInBackground();
-                }
-            }
-        });
 	}
 
 	@Override
@@ -197,6 +173,7 @@ public class LoginActivity extends Activity {
             Log.d("login", "sign up ok, load next page");
             Intent i = new Intent(getApplicationContext(), SecretListActivity.class);
 			startActivity(i);
+            finish();
             
         } catch (Exception e) {
             Log.d("Exception at the bottom of LoginActivity", e.toString());
